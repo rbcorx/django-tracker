@@ -1,0 +1,47 @@
+{% extends "trackmsg/skeleton.html" %}
+
+{% block heading_main %}Tracker Detail{% endblock %}
+{% block content_m %}
+
+<h2> {{ tracker }} </h2>
+
+<section class="container">
+	<div class="row">	
+		<div class="col-md-12">
+			{% if tracker %}
+				
+				<table class="table table-hover">
+				    <thead>
+				      <tr>
+				        <th>coordinate</th>
+				        <th>time</th>
+				        <th>alerted</th>
+				        <th>fence</th>
+				      </tr>
+				    </thead>
+				    <tbody>
+				      {% for m in tracker.get_activity %}
+				      <tr class="{% if m.alerted %}warning{% else %}active{% endif %}"
+				      >
+				        <td>{{ m.get_coordinates }}</td>
+				        <td>{{ m.timestamp }}</td>
+				        <td>{{ m.alerted }}</td>
+				        <td>{{ m.geo_fence }}</td>
+				      </tr>
+				      {% endfor %}
+				    </tbody>
+				  </table>
+
+				<ul class="list-group">
+					
+				</ul>
+			
+
+			{% else %}
+				<h3> 404!!! </h3>
+			{% endif %}
+		</div>
+	</div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "trackmsg/skeleton.html" %}
+
+{% block heading_main %}Tracker List {% endblock %}
+{% block content_m %}
+<section class="container">
+	<div class="row">	
+		<div class="col-md-10 col-md-offset-1">
+			{% if trackers %}
+				
+				<table class="table table-hover">
+				    <thead>
+				      <tr>
+				        <th>tag</th>
+				        <th>activity</th>
+				        <th>alerts</th>
+				        <th>created</th>
+				        <th>active</th>
+				      </tr>
+				    </thead>
+				    <tbody>
+				      {% for t in trackers %}
+				      <tr class="{% if t.active %}success{% else %}active{% endif %}"
+				      >
+				        <td> <a href="{% url "trackmsg:detail" t.pk %}"> {{ t }} </a> </td>
+				        <td>{{ t.get_total_messages }}</td>
+				        <td>{{ t.get_total_alerts }}</td>
+				        <td>{{ t.created }}</td>
+				        <td>{{ t.active }}</td>
+				      </tr>
+				      {% endfor %}
+				    </tbody>
+				  </table>
+
+				<ul class="list-group">
+					
+				</ul>
+			
+
+			{% else %}
+				<h3> No trackers found! </h3>
+			{% endif %}
+		</div>
+	</div>
+</section>
+{% endblock %}
