@@ -21,7 +21,7 @@
 				    </thead>
 				    <tbody>
 				      {% for m in tracker.get_activity %}
-				      <tr class="{% if m.alerted %}warning{% else %}active{% endif %}"
+				      <tr class="{% if m.alerted %}danger{% else %}active{% endif %}"
 				      >
 				        <td>{{ m.get_coordinates }}</td>
 				        <td>{{ m.timestamp }}</td>

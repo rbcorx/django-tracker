@@ -50,6 +50,10 @@ class MessagePush(generic.View):
 			res["errors"] = "Unidentified Slug!"
 			return JsonResponse(res, status=404)
 
+		if not tracker.active:
+			res["errors"] = "tracker is inactive!"
+			return JsonResponse(res, status=400)
+			
 		_m = Message(tracker=tracker, coordinate=point)
 		
 		if not _m.process():

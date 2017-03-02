@@ -19,7 +19,7 @@
 				    </thead>
 				    <tbody>
 				      {% for t in trackers %}
-				      <tr class="{% if t.active %}success{% else %}active{% endif %}"
+				      <tr class="{% if t.active %}success{% else %}active{% endif %} {% if t.get_total_alerts %}danger{% endif %}"
 				      >
 				        <td> <a href="{% url "trackmsg:detail" t.pk %}"> {{ t }} </a> </td>
 				        <td>{{ t.get_total_messages }}</td>
