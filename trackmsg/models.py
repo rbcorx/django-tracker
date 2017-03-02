@@ -36,6 +36,8 @@ class GeoFence(models.Model):
 	def get_vertices(self):
 		"""returns list of vertices (x, y) decompresed and converted to float"""
 		return list(map(lambda x: x.split(DELIMITER_COOR), self.vertices.split(DELIMITER_VERT)))
+
+	get_vertices.short_description = "Vertices"
 	
 	def encloses(self, point):
 		"""detects if the given vertex tuple falls within the fence
@@ -58,6 +60,8 @@ class Tracker(models.Model):
 	active = models.BooleanField(blank=True, default=False, help_text="Sets this tracker to active tracking")
 	url = models.SlugField(help_text="the url for this tracker will be /track/<url>", db_index=True, unique=True)
 	geo_fences = models.ManyToManyField(GeoFence)
+
+	active.boolean = True
 
 	def __str__ (self):
 		return self.tag
@@ -96,10 +100,13 @@ class Tracker(models.Model):
 		"""Returns total number of messages passed"""
 		return self.get_activity(count=True)
 
+	get_total_messages.short_description = "Activity"
+
 	def get_total_alerts(self):
 		"""Returns total number of alerts raised"""
 		return self.get_activity(alerts_only=True, count=True)
 
+	get_total_alerts.short_description = "Alerts"
 
 class Message(models.Model):
 	"""
@@ -118,6 +125,8 @@ class Message(models.Model):
 		by {}".format(DELIMITER_COOR))
 	alerted = models.BooleanField(default=False, blank=True)
 	geo_fence = models.ForeignKey(GeoFence, null=True, blank=True)
+
+	alerted.boolean = True
 
 	def __str__ (self):
 		return "{}: {}".format(self.tracker, self.coordinate)
@@ -138,6 +147,8 @@ class Message(models.Model):
 	def get_coordinates(self):
 		"""Returns a coordinate tuple of floats as (x, y)"""
 		return tuple(map(float, self.coordinate.split(DELIMITER_COOR)))
+
+	get_coordinates.short_description = "Coordinates"
 
 
 
