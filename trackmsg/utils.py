@@ -4,8 +4,11 @@ def convert_points_to_str(points):
 	"""converts points to a delimited concatenated string"""
 	return DELIMITER_VERT.join(map(lambda x: DELIMITER_COOR.join(map(str, x)), points))
 
+#TODO refactor
+
 def universal_order(converter):
-	# order is the order of magnitutes of 10 the whole point space was multiplied to convert to integer without loosing float precision
+	"""order is the order of magnitutes of 10 the whole point space 
+	was multiplied to convert to integer without loosing float precision"""
 	order = [0] # using list as wrapper to get access to mutable and outer non-global scope variables
 	def converter_uni(points):
 		order_zero, points = converter(points, order[0])
@@ -16,7 +19,8 @@ def universal_order(converter):
 
 @universal_order
 def convert_points_to_int(points, order):
-	"""converts list of tuple of x, y points from float to int without loosing precision by increasing the order of the space"""
+	"""converts list of tuple of x, y points from float to int without loosing 
+	precision by increasing the order of the space"""
 	if len(points) <= 0:
 		return points
 

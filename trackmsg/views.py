@@ -63,14 +63,4 @@ class MessagePush(generic.View):
 
 		return JsonResponse(res, status=201)
 
-
-"""
-views
-
-tracker list
-tracker create and edit
-
-tracker detail
-	activity list
-
-"""
+#TODO tracker create and edit
