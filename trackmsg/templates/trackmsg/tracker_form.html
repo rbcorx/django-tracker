@@ -1,0 +1,28 @@
+{% extends "trackmsg/skeleton.html" %}
+{% load bootstrap %}
+
+{% block heading_main %}Tracker Form :{% if instance %} Editing instance{% else %}Create{% endif %} {% endblock %}
+{% block content_m %}
+<section class="container">
+	<div class="row">
+	    <div class="col-md-6 col-md-offset-3">
+			{% if form %}
+			<form  class="form-horizontal" method="post" action="{% if pk %}{% url 'trackmsg:form-edit' pk %}{% else %}{% url 'trackmsg:form' %}{% endif %}">
+				{% csrf_token %}
+				{{ form | bootstrap_horizontal }}
+				<div class="form-group">
+		          <div class="col-sm-10 col-sm-offset-2">
+
+		            <input type="submit" class="btn btn-primary" value="Create" />
+		            <!--<button type="submit" class="btn btn-primary">Submit</button>-->
+		          </div>
+
+		        </div>
+			</form>
+			{% endif %}
+		
+		</div>
+	</div>
+</section>
+
+{% endblock %}

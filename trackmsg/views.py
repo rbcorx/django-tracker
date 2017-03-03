@@ -1,14 +1,15 @@
 import json
 
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views import generic
+from django.core.urlresolvers import reverse
 
 from .populate import DEF_USER as DU
-from .models import *
+from .models import Tracker, Message, GeoFence, DELIMITER_COOR
+from .forms import TrackerForm
 
-def test(request):
-	return render(request, "trackmsg/skeleton.html", {})
+#TODO login_required to views
 
 class TrackerList(generic.ListView):
 	template = "trackmsg/tracker_list.html"
@@ -22,6 +23,43 @@ class TrackerList(generic.ListView):
 class TrackerDetail(generic.DetailView):
 	model = Tracker
 	template = "trackmsg/tracker_detail.html"
+
+
+class TrackerFormView(generic.View):
+
+	def get(self, request, *args, **kwargs):
+		context = {}
+		if "pk" in kwargs:
+			# creating edit form for Tracker:pk
+				context["form"] = TrackerForm(instance=get_object_or_404(Tracker, pk=kwargs["pk"]))
+				context["pk"] = kwargs["pk"]
+		else:
+			# creating fresh form
+			context["form"] = TrackerForm()
+		return render(request, 'trackmsg/tracker_form.html', context)
+
+
+	def post(self, request, *args, **kwargs):
+		context = {}
+		create = False
+		if "pk" in kwargs:
+			# editing Tracker:pk
+				form = TrackerForm(request.POST, instance=get_object_or_404(Tracker, pk=kwargs["pk"]))
+		else:
+			# creating new tracker
+			form = TrackerForm(request.POST)
+			create = True
+		if form.is_valid():
+			tracker = form.save(commit=False)
+			#TODO patch allow owner only edit
+			if create:
+				tracker.user = request.user
+			tracker.save()
+			return HttpResponseRedirect(reverse("trackmsg:list"))
+		else:
+			context["form"] = form
+		return render(request, 'trackmsg/tracker_form.html', context)
+
 
 
 class MessagePush(generic.View):
@@ -53,7 +91,7 @@ class MessagePush(generic.View):
 		if not tracker.active:
 			res["errors"] = "tracker is inactive!"
 			return JsonResponse(res, status=400)
-			
+
 		_m = Message(tracker=tracker, coordinate=point)
 		
 		if not _m.process():

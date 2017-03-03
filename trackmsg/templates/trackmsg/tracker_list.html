@@ -1,6 +1,8 @@
 {% extends "trackmsg/skeleton.html" %}
 
-{% block heading_main %}Tracker List {% endblock %}
+{% block heading_main %}Tracker List 
+<a href="{% url "trackmsg:form" %}" style=""> 
+<span  class="glyphicon glyphicon-plus-sign" style="display:inline-block;position: relative;top:5px;"> </span></a> {% endblock %}
 {% block content_m %}
 <section class="container">
 	<div class="row">	
@@ -19,13 +21,24 @@
 				    </thead>
 				    <tbody>
 				      {% for t in trackers %}
-				      <tr class="{% if t.active %}success{% else %}active{% endif %} {% if t.get_total_alerts %}danger{% endif %}"
+				      <tr class="{% if t.active %}
+				      {% if t.get_total_alerts %}
+				      danger
+				      {% else %}
+				      success
+				      {% endif %}
+				      {% else %}active{% endif %}"
 				      >
 				        <td> <a href="{% url "trackmsg:detail" t.pk %}"> {{ t }} </a> </td>
 				        <td>{{ t.get_total_messages }}</td>
 				        <td>{{ t.get_total_alerts }}</td>
 				        <td>{{ t.created }}</td>
 				        <td>{{ t.active }}</td>
+				        <td> 
+					        <a href="{% url "trackmsg:form-edit" t.pk %}" class="btn btn-info btn-xs">
+					          <span class="glyphicon glyphicon-pencil"></span> Edit
+					        </a> 
+					    </td>
 				      </tr>
 				      {% endfor %}
 				    </tbody>
