@@ -127,3 +127,19 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
 ]
+
+
+
+ADMINS = [('Ronnie', 'ronniebhase@gmail.com'),]
+
+# email settings
+
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'dev.smtp.cor@gmail.com'
+SERVER_EMAIL = 'dev.smtp.cor@gmail.com'
+
+EMAIL_HOST = 'smtp.gmail.com'
+# Port for sending e-mail.
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'dev.smtp.cor@gmail.com'
+EMAIL_HOST_PASSWORD = 'roottest'
