@@ -22,6 +22,7 @@ class GeoFence(models.Model):
 	#TODO add get_vertices method to model post processing just like datetime field
 	"""
 	label = models.CharField(max_length=50, default="test-fence-tria")
+	# TODO: Store this field as an native Array.
 	vertices = models.CharField(max_length=300, 
 		help_text="Concatenated list of vertices delimited by '{}' , coordinates of a \
 			vertex are delimited by '{}'".format(DELIMITER_VERT, DELIMITER_COOR))
@@ -35,7 +36,12 @@ class GeoFence(models.Model):
 
 	def get_vertices(self):
 		"""returns list of vertices (x, y) decompresed and converted to float"""
-		return list(map(lambda x: x.split(DELIMITER_COOR), self.vertices.split(DELIMITER_VERT)))
+		if not type(self.vertices) == list:
+			self.vertices = list(map(lambda x: list(map(int, x.split(DELIMITER_COOR))), self.vertices.split(DELIMITER_VERT)))
+		
+		return self.vertices
+
+
 
 	get_vertices.short_description = "Vertices"
 	
@@ -54,10 +60,12 @@ class Tracker(models.Model):
 	Model for trackers created by the user to track passed messages
 	"""
 	user = models.ForeignKey(User, db_index=True)
+	# TODO: Rename 'tag' to 'name'
 	tag = models.CharField(max_length=50, unique=True, help_text="tag name for tracker, \
 		has to be unique and can only contain characters, underscores and numbers")
 	created = models.DateTimeField(blank=True, editable=False, default=timezone.now)
 	active = models.BooleanField(blank=True, default=False, help_text="Sets this tracker to active tracking")
+	# TODO: Rename this to slug.
 	url = models.SlugField(help_text="the url for this tracker will be /track/<url>", db_index=True, unique=True)
 	geo_fences = models.ManyToManyField(GeoFence)
 
@@ -86,7 +94,7 @@ class Tracker(models.Model):
 		}
 
 		if geo_fences:
-			kwargs["geo_fences__in"] = geo_fences
+			kwargs["geo_fence__in"] = geo_fences
 		if alerts_only:
 			kwargs["alerted"] = True
 
@@ -121,9 +129,11 @@ class Message(models.Model):
 	"""
 	tracker = models.ForeignKey(Tracker, db_index=True)
 	timestamp = models.DateTimeField(blank=True, editable=False, default=timezone.now, db_index=True)
+	# TODO: Refactor coordinate to use Django serialization
 	coordinate = models.CharField(max_length=100, help_text="cocatenated tuple of coordinates delimited \
 		by {}".format(DELIMITER_COOR))
 	alerted = models.BooleanField(default=False, blank=True)
+	# TODO: 
 	geo_fence = models.ForeignKey(GeoFence, null=True, blank=True)
 
 	alerted.boolean = True

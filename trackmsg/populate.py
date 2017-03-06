@@ -25,6 +25,7 @@ finally:
 	#global constants
 	TEST_VERTICES_STR = "1{0}1{1}10{0}10{1}20{0}20{1}20{0}1".format(DELIMITER_COOR, DELIMITER_VERT)
 	TEST_VERTICES = ((1, 1), (10, 10), (20, 20), (20, 1),)
+	TEST_VERTICES = list(map(lambda x: list(x), TEST_VERTICES))
 	DEF_USER = User.objects.all()[0]
 
 

@@ -12,6 +12,9 @@ from .forms import TrackerForm
 
 #TODO login_required to views
 
+# TODO renamve views append view, remove form
+# TODO restructure file to directory package
+
 class TrackerList(generic.ListView):
 	template = "trackmsg/tracker_list.html"
 	context_object_name = "trackers"
@@ -78,7 +81,7 @@ class MessagePush(generic.View):
 	http_method_names = ['options', 'trace', 'post']
 
 	def post(self, request, *args, **kwargs):
-		#TODO refactor this
+		#TODO refactor this, make separate model function to fetch point
 		data = json.loads(request.body)
 		res = {}
 		status = None

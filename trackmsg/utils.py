@@ -2,6 +2,9 @@ from .models import DELIMITER_VERT, DELIMITER_COOR
 
 def convert_points_to_str(points):
 	"""converts points to a delimited concatenated string"""
+	if not type(points[0]) == list:
+		# single point only
+		points = [points,]
 	return DELIMITER_VERT.join(map(lambda x: DELIMITER_COOR.join(map(str, x)), points))
 
 #TODO refactor
