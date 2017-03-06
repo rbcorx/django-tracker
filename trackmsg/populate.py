@@ -96,6 +96,7 @@ def create_activity(x=50, clear_all=True):
 
 	# creating messages
 	messages = [Message.objects.create(**_d) for _d in data]
+	list(map(lambda x: x.process(), messages))
 
 	return messages
 
