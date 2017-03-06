@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import ast 
 
 import matplotlib.path as mtpPath
 import numpy as np
@@ -16,41 +17,47 @@ DELIMITER_COOR = ','
 #TODO validators
 
 
+class ListField(models.TextField):
+    __metaclass__ = models.SubfieldBase
+    description = "Stores a python list"
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            value = []
+
+        if isinstance(value, list):
+            return value
+        return ast.literal_eval(value)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+
+        return unicode(value)
+
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return self.get_db_prep_value(value)
+
 class GeoFence(models.Model):
 	"""
 	Model for geofence representing a polygon by the list of its vertices in clockwise order
-	#TODO add get_vertices method to model post processing just like datetime field
 	"""
 	label = models.CharField(max_length=50, default="test-fence-tria")
-	# TODO: Store this field as an native Array.
-	vertices = models.CharField(max_length=300, 
-		help_text="Concatenated list of vertices delimited by '{}' , coordinates of a \
-			vertex are delimited by '{}'".format(DELIMITER_VERT, DELIMITER_COOR))
+	vertices = ListField(max_length=100, help_text="vertices of polygon")
 
 	def __str__(self):
 		return self.label
-
-	def set_vertices(self):
-		"""sets self.vertices to the return value of get_vertices"""
-		self.vertices = self.get_vertices()
-
-	def get_vertices(self):
-		"""returns list of vertices (x, y) decompresed and converted to float"""
-		if not type(self.vertices) == list:
-			self.vertices = list(map(lambda x: list(map(int, x.split(DELIMITER_COOR))), self.vertices.split(DELIMITER_VERT)))
-		
-		return self.vertices
-
-
-
-	get_vertices.short_description = "Vertices"
 	
 	def encloses(self, point):
 		"""detects if the given vertex tuple falls within the fence
 			ARGS:
 				point: tuple representing point as x, y
 		"""
-		_polygon = mtpPath.Path(np.array(self.get_vertices()))
+		_polygon = mtpPath.Path(np.array(self.vertices))
 		return _polygon.contains_point(point)
 
 
@@ -60,8 +67,7 @@ class Tracker(models.Model):
 	Model for trackers created by the user to track passed messages
 	"""
 	user = models.ForeignKey(User, db_index=True)
-	# TODO: Rename 'tag' to 'name'
-	tag = models.CharField(max_length=50, unique=True, help_text="tag name for tracker, \
+	name = models.CharField(max_length=50, unique=True, help_text="tag name for tracker, \
 		has to be unique and can only contain characters, underscores and numbers")
 	created = models.DateTimeField(blank=True, editable=False, default=timezone.now)
 	active = models.BooleanField(blank=True, default=False, help_text="Sets this tracker to active tracking")
@@ -72,7 +78,7 @@ class Tracker(models.Model):
 	active.boolean = True
 
 	def __str__ (self):
-		return self.tag
+		return self.name
 
 	def get_activity(self, start=None, end=None, alerts_only=False, geo_fences=None, order_by=None, count=False):
 		"""Returns list of messages within the given constraint
@@ -130,8 +136,7 @@ class Message(models.Model):
 	tracker = models.ForeignKey(Tracker, db_index=True)
 	timestamp = models.DateTimeField(blank=True, editable=False, default=timezone.now, db_index=True)
 	# TODO: Refactor coordinate to use Django serialization
-	coordinate = models.CharField(max_length=100, help_text="cocatenated tuple of coordinates delimited \
-		by {}".format(DELIMITER_COOR))
+	coordinate = ListField(max_length=100, help_text="coordinates of the message")
 	alerted = models.BooleanField(default=False, blank=True)
 	# TODO: 
 	geo_fence = models.ForeignKey(GeoFence, null=True, blank=True)
@@ -144,7 +149,7 @@ class Message(models.Model):
 	def process(self):
 		"""process this message to raise alerts if any"""
 		geo_fences = self.tracker.geo_fences.all()
-		coord = self.get_coordinates()
+		coord = self.coordinate
 
 		for gf in geo_fences:
 			if gf.encloses(coord):
@@ -153,12 +158,6 @@ class Message(models.Model):
 				self.save()
 				return True
 		return False
-
-	def get_coordinates(self):
-		"""Returns a coordinate tuple of floats as (x, y)"""
-		return tuple(map(float, self.coordinate.split(DELIMITER_COOR)))
-
-	get_coordinates.short_description = "Coordinates"
 
 
 

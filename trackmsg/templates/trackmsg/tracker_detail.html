@@ -23,7 +23,7 @@
 				      {% for m in tracker.get_activity %}
 				      <tr class="{% if m.alerted %}danger{% else %}active{% endif %}"
 				      >
-				        <td>{{ m.get_coordinates }}</td>
+				        <td>{{ m.coordinate }}</td>
 				        <td>{{ m.timestamp }}</td>
 				        <td>{{ m.alerted }}</td>
 				        <td>{{ m.geo_fence }}</td>

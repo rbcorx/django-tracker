@@ -9,17 +9,11 @@ from .utils import *
 from .populate import *
 
 
-class UtilTest(TestCase):
-
-	def test_points_to_str(self):
-		points = TEST_VERTICES
-		self.assertEqual(convert_points_to_str(points), TEST_VERTICES_STR)
 
 class GeoFenceTest(TestCase):
 
 	def setUp(self):
 		vertices = [(1,1), (10, 1), (10, 10), (1, 10)] # square
-		vertices = convert_points_to_str(list(map(lambda x: list(x), vertices)))
 		self.point_in = (2, 2)
 		self.point_out = (1, 0)
 		self.point_on = (2,1)
@@ -29,25 +23,10 @@ class GeoFenceTest(TestCase):
 		super(GeoFenceTest, self).setUp()
 
 	def test_geo_fence_point_conversion(self):
-		vertices = TEST_VERTICES_STR
+		vertices = TEST_VERTICES
 		fence = GeoFence(vertices=vertices)
 		vertex = (2, 1.5)
 		self.assertEqual(fence.encloses(vertex), True)
-
-	# Revised
-
-	def test_set_and_fetch_vertex(self, vertices=None):
-		vertices = TEST_VERTICES if vertices is None else vertices
-		fence = GeoFence(vertices=convert_points_to_str(vertices))
-		fence.save()
-		pk = fence.pk
-		fence = GeoFence.objects.get(pk=pk)
-		fence.set_vertices()
-		self.assertEqual(fence.get_vertices(), vertices)
-
-	def test_get_vertices_single_coor(self):
-		vertex = [[19, 27]]
-		self.test_set_and_fetch_vertex(vertices=vertex)
 
 	def test_encloses_yes(self):
 		self.assertEqual(self.geo_fence.encloses(self.point_in), True)
@@ -156,16 +135,6 @@ class TrackerTest(TestCase):
 
 
 class MessageTest(TestCase):
-	"""
-	def process(self):
-	def get_coordinates(self):
-
-		process detected and enlosed
-		process undtected and not enclosed
-
-	set coord_ get coor
-
-	"""
 
 	def setUp(self):
 		create_activity()
@@ -175,7 +144,7 @@ class MessageTest(TestCase):
 		messages = Message.objects.all()
 		res = []
 		for m in messages:
-			coor = m.get_coordinates()
+			coor = m.coordinate
 			detected = any(map(lambda g: g.encloses(coor), m.tracker.geo_fences.all()))
 			if detected:
 				res.append(all([m.process(), detected]))
@@ -186,18 +155,12 @@ class MessageTest(TestCase):
 		messages = Message.objects.all()
 		res = []
 		for m in messages:
-			coor = m.get_coordinates()
+			coor = m.coordinate
 			detected = any(map(lambda g: g.encloses(coor), m.tracker.geo_fences.all()))
 			if not detected:
 				res.append(all([m.process(), detected]))
 				res[len(res)-1] &= m.alerted
 		self.assertEqual(all(res), False)
-
-	def test_get_coordinate(self):
-		messages = Message.objects.all()
-
-		self.assertEqual(all(map(lambda m: m.get_coordinates() == 
-			tuple(map(float, m.coordinate.split(DELIMITER_COOR))), messages)), True)
 
 
 

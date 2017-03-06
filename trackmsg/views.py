@@ -137,7 +137,7 @@ class MessagePush(generic.View):
 		
 		send_mail(
 		    'Tracker alert!',
-		    'You awesome tracker has detected coordinates: {} in geo-fence {}.'.format(message.get_coordinates(), message.geo_fence),
+		    'You awesome tracker has detected coordinates: {} in geo-fence {}.'.format(message.coordinate, message.geo_fence),
 		    'admin@localhost.com',
 		    [email,],
 		    fail_silently=False,

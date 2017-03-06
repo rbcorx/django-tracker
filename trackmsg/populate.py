@@ -23,7 +23,6 @@ finally:
 	from trackmsg.utils import *
 
 	#global constants
-	TEST_VERTICES_STR = "1{0}1{1}10{0}10{1}20{0}20{1}20{0}1".format(DELIMITER_COOR, DELIMITER_VERT)
 	TEST_VERTICES = ((1, 1), (10, 10), (20, 20), (20, 1),)
 	TEST_VERTICES = list(map(lambda x: list(x), TEST_VERTICES))
 	DEF_USER = User.objects.all()[0]
@@ -41,7 +40,7 @@ def clear():
 
 def create_fences(x=5):
 	"""Creates 'x' geofence instances"""
-	return [GeoFence.objects.create(vertices=TEST_VERTICES_STR) for i in xrange(x)]
+	return [GeoFence.objects.create(vertices=TEST_VERTICES) for i in xrange(x)]
 
 
 def create_trackers(x=5, clear_all=True):
@@ -52,7 +51,7 @@ def create_trackers(x=5, clear_all=True):
 	# default dummy data template
 	_data = {
 	'user': DEF_USER,
-	'tag': "tag-{}",
+	'name': "name-{}",
 	'url':"tag-{}",
 	}
 
@@ -60,7 +59,7 @@ def create_trackers(x=5, clear_all=True):
 	
 	# filling dummy data for each unique instance
 	for i, _d in enumerate(data): 
-		_d['tag'] = _d['tag'].format(i)
+		_d['name'] = _d['name'].format(i)
 		_d['url'] = _d['url'].format(i)
 
 	geo_fences = create_fences()
@@ -92,7 +91,7 @@ def create_activity(x=50, clear_all=True):
 	# randomly filling dummy data for each instance
 	for i, _d in enumerate(data): 
 		_d['tracker'] = trackers[random.randint(0, len(trackers)-1)]
-		_d['coordinate'] = "{0}{1}{2}".format(random.randint(1, 10), DELIMITER_COOR, random.randint(1, 10))
+		_d['coordinate'] = [random.randint(1, 10), random.randint(1, 10)]
 
 	# creating messages
 	messages = [Message.objects.create(**_d) for _d in data]
