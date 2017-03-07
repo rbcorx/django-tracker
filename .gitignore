@@ -1,5 +1,4 @@
 mocks
-*.sqlite*
 *.pyc
 static/admin/
 *.rdb

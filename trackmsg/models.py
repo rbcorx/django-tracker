@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import ast 
+import ast
 
 import matplotlib.path as mtpPath
 import numpy as np
@@ -51,7 +51,7 @@ class GeoFence(models.Model):
 
 	def __str__(self):
 		return self.label
-	
+
 	def encloses(self, point):
 		"""detects if the given vertex tuple falls within the fence
 			ARGS:
@@ -105,7 +105,7 @@ class Tracker(models.Model):
 			kwargs["alerted"] = True
 
 		_qset = self.message_set.filter(**kwargs).order_by(order_by)
-		
+
 		if count:
 			return _qset.count()
 		return _qset
@@ -126,11 +126,11 @@ class Message(models.Model):
 	"""
 	Model for messages passed to Tracker
 	#TODO CHECK AND REFACTOR
-		geofence processing should be carried our asynchronously and 
+		geofence processing should be carried our asynchronously and
 
 	#TODO add coordinate conversion to model post processing just like datetime field
 	coordinate: (charfield) concatenated tuple of vertex (x, y) by COOR_DELIMITER
-	
+
 	#TODO send email to user
 	"""
 	tracker = models.ForeignKey(Tracker, db_index=True)
@@ -138,8 +138,8 @@ class Message(models.Model):
 	# TODO: Refactor coordinate to use Django serialization
 	coordinate = ListField(max_length=100, help_text="coordinates of the message")
 	alerted = models.BooleanField(default=False, blank=True)
-	# TODO: 
-	geo_fence = models.ForeignKey(GeoFence, null=True, blank=True)
+	# TODO:
+	geo_fence = ListField(max_length=100, help_text="list of pks of geo fences triggered", null=True, blank=True)
 
 	alerted.boolean = True
 
