@@ -1,0 +1,4 @@
+mocks
+*.sqlite*
+*.pyc
+static/admin/

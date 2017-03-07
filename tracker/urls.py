@@ -17,9 +17,15 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf.urls.static import static
 
+from trackmsg.views import RegisterView
+
 import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include("trackmsg.urls")),
+    url(r'^accounts/register/', RegisterView.as_view(), name="register-user"),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+
+    url(r'^track/', include("trackmsg.urls")),
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

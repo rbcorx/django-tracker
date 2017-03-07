@@ -8,7 +8,7 @@ def setup():
 	project_dir = os.path.abspath(os.path.join(script_path,'..'))
 	sys.path.insert(0, project_dir)
 	os.environ['DJANGO_SETTINGS_MODULE']='tracker.settings'
-	
+
 	import django
 	django.setup()
 
@@ -52,13 +52,13 @@ def create_trackers(x=5, clear_all=True):
 	_data = {
 	'user': DEF_USER,
 	'name': "name-{}",
-	'url':"tag-{}",
+	'url':"name-{}",
 	}
 
 	data = [dict(_data) for i in xrange(x)]
-	
+
 	# filling dummy data for each unique instance
-	for i, _d in enumerate(data): 
+	for i, _d in enumerate(data):
 		_d['name'] = _d['name'].format(i)
 		_d['url'] = _d['url'].format(i)
 
@@ -89,7 +89,7 @@ def create_activity(x=50, clear_all=True):
 	data = [dict(_data) for i in xrange(x)]
 
 	# randomly filling dummy data for each instance
-	for i, _d in enumerate(data): 
+	for i, _d in enumerate(data):
 		_d['tracker'] = trackers[random.randint(0, len(trackers)-1)]
 		_d['coordinate'] = [random.randint(1, 10), random.randint(1, 10)]
 
@@ -105,5 +105,5 @@ def deploy():
 	print t
 
 
-if __name__ == "__main__":	
+if __name__ == "__main__":
 	deploy()

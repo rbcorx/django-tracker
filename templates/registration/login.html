@@ -1,0 +1,55 @@
+{% extends "skeleton.html" %}
+{% load bootstrap %}
+
+{% block title %}Login{% endblock %}
+
+{% block content_m %}
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+    <p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+    {% else %}
+    <p>Please login to see this page.</p>
+    {% endif %}
+{% endif %}
+
+<form class="form-horizontal" method="post" action="{% url 'login' %}">
+{% csrf_token %}
+
+{{ form | bootstrap_horizontal }}
+
+<div class="form-group">
+		          <div class="col-sm-10 col-sm-offset-2">
+
+		            <input type="submit" class="btn btn-primary" value="login" />
+		            <!--<button type="submit" class="btn btn-primary">Submit</button>-->
+		          </div>
+				
+		          
+		        </div>
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+{# Assumes you setup the password_reset view in your URLconf #}
+
+<div class="container">
+	<div class="row">	
+		<div class="col-sm-10 col-sm-offset-1">
+			<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+		</div>
+	</div>
+
+<!-- 	<div class="row">	
+		<div class="col-sm-10 col-sm-offset-1">
+			<p><a href="{% url 'register-user' %}">Register as User</a></p>
+		</div>
+	</div> -->
+
+</div>
+
+{% endblock %}
