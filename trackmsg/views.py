@@ -151,8 +151,10 @@ class MessagePush(generic.View):
 					res["errors"] = "Couldn't save message!"
 					status=400
 			else:
-				notify.delay(request.user.pk, 'Your awesome tracker has detected coordinates: \
-					{} in geo-fence {}.'.format(_m.coordinate, _m.geo_fence))
+				fences = list(map(lambda pk: GeoFence.objects.get(pk=pk).label, _m.geo_fence)) \
+							if type(_m.geo_fence) == list else GeoFence.objects.get(pk=_m.geo_fence).label
+				notify.delay(request.user.pk, 'Your awesome tracker has detected coordinates: ' + \
+				 '{} in geo-fence(s) {}.'.format(_m.coordinate, fences))
 				#self.notify_user(request.user, _m)
 				res["message"] = "success! message stored and alerted!"
 				status = 201
@@ -161,5 +163,6 @@ class MessagePush(generic.View):
 
 
 
+def test(request):
+	return render(request, "trackmsg/curves.html", {})
 
-#TODO tracker create and edit

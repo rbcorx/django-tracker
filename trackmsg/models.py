@@ -150,13 +150,13 @@ class Message(models.Model):
 		"""process this message to raise alerts if any"""
 		geo_fences = self.tracker.geo_fences.all()
 		coord = self.coordinate
-
-		for gf in geo_fences:
-			if gf.encloses(coord):
-				self.alerted = True
-				self.geo_fence = gf
-				self.save()
-				return True
+		triggered = list(map(lambda x: x.pk, filter(lambda x: x.encloses(coord), geo_fences)))
+		if len(triggered) > 0:
+			self.alerted = True
+			print triggered, ": triggered geo_fences!"
+			self.geo_fence = triggered
+			self.save()
+			return True
 		return False
 
 
