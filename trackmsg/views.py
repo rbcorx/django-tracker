@@ -1,16 +1,24 @@
 import json
 
+import time
+import datetime
+import itertools
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views import generic
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import connection
+from django.db.models import Sum, Count
+from django.utils import timezone
 
 #from .populate import DEF_USER as DU
 from .models import Tracker, Message, GeoFence, DELIMITER_COOR
 from .forms import TrackerForm, UserForm
 from .tasks import notify
+from .utils import date_str_to_unix
 
 #TODO login_required to views
 
@@ -164,5 +172,46 @@ class MessagePush(generic.View):
 
 
 def test(request):
+	"""Testing curves views"""
 	return render(request, "trackmsg/curves.html", {})
 
+def get_data(request, pk):
+	truncate_date = connection.ops.date_trunc_sql('day', 'timestamp')
+	qs = Message.objects.filter(tracker=get_object_or_404(Tracker, pk=pk)).extra({'day':truncate_date})
+	report = qs.values('day', 'alerted').annotate(Count('pk')).order_by('day')
+
+	alerts = map(lambda el: [el['day'], el['pk__count']], filter(lambda r: r['alerted'], report))
+	activity = map(lambda x: [x[0], reduce(lambda x, y: x + y["pk__count"], x[1], 0)],
+		itertools.groupby(report, key=lambda x: x['day']))
+
+	# putting filler data of tracker had zero activity
+	if not len(activity):
+		activity = [[timezone.now().strftime("%Y-%m-%d"), 0]]
+		per_alerts = 0
+	else:
+		# TODO optimize list traversals
+		per_alerts = reduce(lambda x, y: x + y[1], alerts, 0) * 100 / float(reduce(lambda x, y: x + y[1], activity, 0))
+
+
+	start = activity[0][0]
+	end = activity[-1][0]
+
+	# if data for only one date is available, adding previous date as filler
+	if start == end:
+		prev = (datetime.datetime.strptime(start, "%Y-%m-%d") + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")
+		activity.insert(0, [prev, 0])
+
+	# normalizing alerts for missing data
+	alerts_filled = []
+	ii = 0
+	for a in activity:
+		if len(alerts)>ii and a[0] == alerts[ii][0]:
+			alerts_filled.append(alerts[ii])
+			ii += 1
+		else:
+			alerts_filled.append([a[0], 0])
+
+	max_lim = max(activity, key=lambda x: x[1])[1] + 2
+
+	return JsonResponse({"alerts": alerts_filled, "activity": activity, "percent_alerts": per_alerts,
+		"starts": start, "ends": end, "upper": max_lim})

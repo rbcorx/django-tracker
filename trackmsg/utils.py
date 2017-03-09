@@ -1,4 +1,11 @@
+import datetime
+import time
+
 from .models import DELIMITER_VERT, DELIMITER_COOR
+
+def date_str_to_unix(date):
+	"""converts date string to unix timestamp. format of str: YYYY-MM-DD"""
+	return time.mktime(datetime.datetime.strptime(date, "%Y-%m-%d").timetuple())
 
 def convert_points_to_str(points):
 	"""converts points to a delimited concatenated string"""
@@ -10,7 +17,7 @@ def convert_points_to_str(points):
 #TODO refactor
 
 def universal_order(converter):
-	"""order is the order of magnitutes of 10 the whole point space 
+	"""order is the order of magnitutes of 10 the whole point space
 	was multiplied to convert to integer without loosing float precision"""
 	order = [0] # using list as wrapper to get access to mutable and outer non-global scope variables
 	def converter_uni(points):
@@ -22,7 +29,7 @@ def universal_order(converter):
 
 @universal_order
 def convert_points_to_int(points, order):
-	"""converts list of tuple of x, y points from float to int without loosing 
+	"""converts list of tuple of x, y points from float to int without loosing
 	precision by increasing the order of the space"""
 	if len(points) <= 0:
 		return points
@@ -33,11 +40,9 @@ def convert_points_to_int(points, order):
 	order += 1
 	return (order, points)
 
-
-
 def test():
 	#convert_points_to_int([1, 1])
-	
+
 	import matplotlib.path as mplPath
 	import numpy as np
 

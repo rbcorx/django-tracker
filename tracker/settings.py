@@ -32,7 +32,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # custom
-    'trackmsg',
+    'trackmsg.apps.TrackmsgConfig',
+    #'trackmsg',
     # native
     'django.contrib.admin',
     'django.contrib.auth',

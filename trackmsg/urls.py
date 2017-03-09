@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
-from .views import TrackerList, TrackerDetail, MessagePush, TrackerFormView, test
+from .views import TrackerList, TrackerDetail, MessagePush, TrackerFormView, test, get_data
 
 app_name = "trackmsg"
 
@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^form/$', TrackerFormView.as_view(), name='form'),
     url(r'^form/(?P<pk>[0-9]+)/$', TrackerFormView.as_view(), name='form-edit'),
     url(r'^curve/', test, name="curves"),
+    url(r'^curve-data/(?P<pk>[0-9]+)/$', get_data, name="curves-data"),
 
 ]
